@@ -9,7 +9,7 @@ let puntos = 0;
 
 //Preguntar cuantas jugadores habra por pantalla
 //jugadores = document.getElementById("#numJugadores");
-jugadores = 14;
+jugadores = 6;
 console.log("Jugadores: ", jugadores);
 
 //Crear cartas
@@ -41,15 +41,19 @@ const valorCarta = (carta) =>{
 };
 
 
-//Jugadores
+//Funcion para añadir jugadores en html
+const jugadorNuevo = (aux) =>{
+    const jug = document.createElement("h1");
+    jug.innerHTML = "Jugador "+aux+" - <small>0</small> </n>";
+    document.getElementById("addJugador").appendChild(jug);
+};   
+
 const crearJugadores = (num) =>{
-for (let i = 2; i<=jugadores; i++){
-    aux = document.getElementById("#addJugador");
-    aux.innerHTML = '<h1>Jugador 1 - <small>0</small></h1>';
+    for (let i = 1; i<= num; i++){
+        jugadorNuevo(i);
     }
 };
 
 crearBaraja();
 console.log("Baraja ordenada",baraja);
-console.log(valorCarta("AC"));
 crearJugadores(jugadores);

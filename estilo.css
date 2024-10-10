@@ -1,0 +1,35 @@
+html, body{
+    background-color: #2f4f30;
+    color: white;
+}
+
+.cabecera{
+    text-align:center;
+    background-color: black;
+    color: white;
+    padding: 20px;
+    font-size: 1.5em;
+}
+
+.carta{
+    width: 100px;
+    position: relative;
+    left: 100px;
+    margin-left: -75px;
+    margin-top: 15px;
+}
+
+#banca-cartas, #jugador-cartas{
+    height: 220px;
+}
+
+#boton{
+    padding-bottom: 20px;
+}
+
+#Ganador{
+    text-align: center;
+    font-weight: bold;
+    color: cornflowerblue;
+    font-size: 1.5em;
+}
