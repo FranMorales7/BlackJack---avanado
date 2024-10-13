@@ -1,5 +1,5 @@
 html, body{
-    background-color: #2f4f30;
+    background-color: #a65848;
     color: white;
 }
 
@@ -32,4 +32,24 @@ html, body{
     font-weight: bold;
     color: cornflowerblue;
     font-size: 1.5em;
+}
+
+#main{
+    opacity: 0;
+    z-index: 0;
+}
+
+#cuestionario{
+    margin-top: 15px;
+    margin-left: 15px;
+    z-index: 1;
+    position: relative;
+    top: 250px;
+    left: 350px;
+    font-size: large;
+}
+
+.marcador{
+    position: relative;
+    padding-left: 150px;
 }
