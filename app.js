@@ -100,17 +100,19 @@ botonEnviar.addEventListener("click", () =>{
     console.log("puntos Jug1: ", puntosJ1);
 
     //Creamos las imagenes de las cartas
-    const divCartaJugador = document.querySelectorAll("#jugador-cartas");
+    const crearCarta = () =>{
+        const divCartaJugador = document.querySelectorAll("#jugador-cartas");
+        const nuevaCarta1 = document.createElement("img");
+        nuevaCarta1.classList.add("carta");
+        nuevaCarta1.src = "img/"+carta1+".png";
+        divCartaJugador[0].append(nuevaCarta1);
+        const nuevaCarta2 = document.createElement("img");
+        nuevaCarta2.classList.add("carta");
+        nuevaCarta2.src = "img/"+carta2+".png";
+        divCartaJugador[0].append(nuevaCarta2);
+    };
     
-    const nuevaCarta1 = document.createElement("img");
-    nuevaCarta1.classList.add("carta");
-    nuevaCarta1.src = "img/"+carta1+".png";
-    divCartaJugador[0].append(nuevaCarta1);
-
-    const nuevaCarta2 = document.createElement("img");
-    nuevaCarta2.classList.add("carta");
-    nuevaCarta2.src = "img/"+carta2+".png";
-    divCartaJugador[0].append(nuevaCarta2);
+    crearCarta();
 });
 
 
