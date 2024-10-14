@@ -3,15 +3,16 @@ let jugadores;
 let baraja = [];
 const tipoCarta = ["C", "D", "P", "T"];
 const tipoEspecial = ["A", "K", "Q", "J"];
-let 
-puntosJ1, puntosJ2, puntosJ3, puntosJ4, puntosJ5, puntosJ6, puntosC;
+const puntosJugadores = [
+    puntosJ1 = 0, puntosJ2 = 0, puntosJ3 = 0, puntosJ4 = 0, puntosJ5 = 0, puntosJ6 = 0, puntosC = 0
+];
+
 
 //Referencias al html
 const botonEnviar = document.querySelector("#enviarJug");
 const formJugadores = document.getElementById("numJugadores");
 const cuestionario = document.getElementById("cuestionario");
 const main = document.getElementById("main");
-const divCartaJugador = document.querySelector("#jugador-cartas");
 const marcador = document.querySelectorAll("small");
 
 
@@ -37,15 +38,16 @@ const crearBaraja = () => {
 
 //Pedir cartas
 const pedirCarta = () =>{
-    if(baraja.length === 0){throw "No quedan cartas";} else{
+    if(baraja.length === 0){throw "No quedan cartas";} 
+    else{
         const carta = baraja.pop(); //Saca una carta del array baraja y lo muestra
         return carta;
     };
 };
 
 //calcular el valor de la carta
-const valorCarta = (carta) =>{
-    let puntos = carta.substring(0, carta.length - 1);
+const valorCarta = (puntos, carta) =>{
+    puntos = carta.substring(0, carta.length - 1);
     //Si no es un número, la A valdrá 11 puntos y el resto de especiales 10
     let valor = isNaN(puntos) ? (puntos === "A" ? 11 : 10) : puntos * 1;
     return valor;
@@ -85,22 +87,30 @@ botonEnviar.addEventListener("click", () =>{
     main.style.zIndex = 1; //La pantalla de juego pasa a primer plano
     cuestionario.style.zIndex = 0;//La eleccion de jugadores pasa a segundo plano
 
+    
     const carta1 = pedirCarta();
+    console.log("carta1: ", carta1);
     const carta2 = pedirCarta();
-    puntosJ1 += valorCarta(carta1)+valorCarta(carta2);
+    puntosJ1 += valorCarta(puntosJ1, carta1);
+    puntosJ1 += valorCarta(puntosJ1, carta2);
+
+    //Redefinimos la constante marcador, con los jugadores ya creados
+    const marcador = document.querySelectorAll("small");
     marcador[0].innerText = puntosJ1; 
     console.log("puntos Jug1: ", puntosJ1);
 
-    //Se crea una nueva carta
+    //Creamos las imagenes de las cartas
+    const divCartaJugador = document.querySelectorAll("#jugador-cartas");
+    
     const nuevaCarta1 = document.createElement("img");
     nuevaCarta1.classList.add("carta");
+    nuevaCarta1.src = "img/"+carta1+".png";
+    divCartaJugador[0].append(nuevaCarta1);
+
     const nuevaCarta2 = document.createElement("img");
     nuevaCarta2.classList.add("carta");
-    nuevaCarta1.src = "img/"+carta1+".png";
     nuevaCarta2.src = "img/"+carta2+".png";
-    divCartaJugador.innerHTML(nuevaCarta1);
-    divCartaJugador.innerHTML(nuevaCarta2);
-
+    divCartaJugador[0].append(nuevaCarta2);
 });
 
 
