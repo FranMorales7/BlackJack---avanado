@@ -168,7 +168,7 @@ botonEnviar.addEventListener("click", () =>{
     };
 });
 
-// Cuando se haga clic sobre el botón pedir...
+// Cuando se haga click sobre el botón pedir...
 botonPedir.addEventListener("click", () => {
     const rotulo = document.querySelectorAll(".marcador");
 
@@ -198,9 +198,27 @@ botonPedir.addEventListener("click", () => {
             }
         }
     }
+   
+}); 
+//Si se hace click en el boton Pasar
+botonPasar.addEventListener("click", () =>{
+    botonPedir.disabled = true;
+    botonPasar.disabled = true;
+    rotulo[jugadorActual].classList.remove("tamLetra");
+    jugadorActual++;
+    if (jugadorActual < jugadores) {
+        // Si hay más jugadores, habilitamos los botones para el nuevo jugador
+        botonPedir.disabled = false;
+        botonPasar.disabled = false;
+        rotulo[jugadorActual].classList.add("tamLetra");
+        //Si el jugador supera los 21 puntos
+    } else if(puntosJugadores[jugadorActual] >= 21){
+        botonPedir.disabled = true;
+        botonPasar.disabled = true;
+        rotulo[jugadorActual].classList.remove("tamLetra");
+        jugadorActual++;
+    }
 });
-    
-
 
 crearBaraja();
 console.log("Baraja ordenada",baraja);
