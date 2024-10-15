@@ -53,3 +53,8 @@ html, body{
     position: relative;
     padding-left: 150px;
 }
+
+.tamLetra h1{
+    font-style: italic;
+    background-color: lightgreen;
+}
