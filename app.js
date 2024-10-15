@@ -9,10 +9,12 @@ const puntosJugadores = [
 let puntosCrupier =0;
 let carta1, carta2; //Variables a definir en linea 73
 let nuevaCarta1, nuevaCarta2; //variables a definir en linea 75
+let jugadorActual = 0; 
 
 //Referencias al html
 const botonEnviar = document.querySelector("#enviarJug");
 const botonPedir = document.querySelector("#btnPedir");
+const botonPasar = document.querySelector("#btnPasar");
 const formJugadores = document.getElementById("numJugadores");
 const cuestionario = document.getElementById("cuestionario");
 const main = document.getElementById("main");
@@ -49,7 +51,7 @@ const pedirCarta = () =>{
 };
 
 //calcular el valor de la carta
-const valorCarta = (puntos, carta) =>{
+const valorCarta = (carta) =>{
     puntos = carta.substring(0, carta.length - 1);
     //Si no es un número, la A valdrá 11 puntos y el resto de especiales 10
     let valor = isNaN(puntos) ? (puntos === "A" ? 11 : 10) : puntos * 1;
@@ -86,11 +88,11 @@ const crearCarta = (numCartas, jug) =>{
 
     //Se crean las cartas y se suma su valor a los puntos del jugador
     carta1 = pedirCarta();
-    puntosJugadores[jug] += valorCarta(puntosJugadores[jug], carta1);
+    puntosJugadores[jug] += valorCarta(carta1);
     
     //si esta creada se pide una segunda carta
     if(carta2){carta2 = pedirCarta();
-    puntosJugadores[jug] += valorCarta(puntosJugadores[jug], carta2);
+    puntosJugadores[jug] += valorCarta(carta2);
     };
 
     //Seleccionamos el div cuyo id es "jugador-cartas"
@@ -166,14 +168,38 @@ botonEnviar.addEventListener("click", () =>{
     };
 });
 
-//Cuando se haga click sobre el boton pedir...
-// botonPedir.addEventListener("click", () =>{
-//     rotulo;
-//     for(let i = 0; i<= jugadores; i++){
-//         crearCarta(1,i);
+// Cuando se haga clic sobre el botón pedir...
+botonPedir.addEventListener("click", () => {
+    const rotulo = document.querySelectorAll(".marcador");
 
-//     };
-// })
+    // Verificamos si el jugador actual tiene 21 puntos o menos
+    if (puntosJugadores[jugadorActual] <= 21) {
+        rotulo[jugadorActual].classList.add("tamLetra");  // Resaltar al jugador actual
+        crearCarta(1, jugadorActual);  // Añadir una carta al jugador actual
+
+        // Verificar si después de pedir carta el jugador se pasó de 21
+        if (puntosJugadores[jugadorActual] > 21) {
+            rotulo[jugadorActual].classList.remove("tamLetra");  // Quitar resaltado del jugador actual
+            jugadorActual++;  // Pasar al siguiente jugador
+            if (jugadorActual < jugadores) {  // Si quedan más jugadores
+                rotulo[jugadorActual].classList.add("tamLetra");  // Resaltar al siguiente jugador
+            } else {
+                botonPedir.disabled = true;  // Si ya no quedan más jugadores, deshabilitar el botón
+            }
+        } else if (puntosJugadores[jugadorActual] === 21) {  // Si alcanza 21 puntos
+            rotulo[jugadorActual].classList.remove("tamLetra");
+            resultado.innerText = "--- Jugador "+(jugadorActual + 1)+"GANA ---";  // Mostrar ganador
+            jugadorActual++;
+            if (jugadorActual < jugadores) {
+                rotulo[jugadorActual].classList.add("tamLetra");  // Resaltar al siguiente jugador
+            } else {
+                botonPedir.disabled = true;  // Si ya no quedan más jugadores, deshabilitar el botón
+                console.log("Fin del juego.");
+            }
+        }
+    }
+});
+    
 
 
 crearBaraja();
