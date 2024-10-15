@@ -4,17 +4,20 @@ let baraja = [];
 const tipoCarta = ["C", "D", "P", "T"];
 const tipoEspecial = ["A", "K", "Q", "J"];
 const puntosJugadores = [
-    puntosJ1 = 0, puntosJ2 = 0, puntosJ3 = 0, puntosJ4 = 0, puntosJ5 = 0, puntosJ6 = 0, puntosC = 0
+    puntosJ1 = 0, puntosJ2 = 0, puntosJ3 = 0, puntosJ4 = 0, puntosJ5 = 0, puntosJ6 = 0
 ];
-
+let puntosCrupier =0;
+let carta1, carta2; //Variables a definir en linea 73
+let nuevaCarta1, nuevaCarta2; //variables a definir en linea 75
 
 //Referencias al html
 const botonEnviar = document.querySelector("#enviarJug");
+const botonPedir = document.querySelector("#btnPedir");
 const formJugadores = document.getElementById("numJugadores");
 const cuestionario = document.getElementById("cuestionario");
 const main = document.getElementById("main");
-const marcador = document.querySelectorAll("small");
-
+const resultado = document.querySelector("#Ganador");
+const rotulo = document.querySelectorAll(".marcador");
 
 //Crear cartas
 const crearBaraja = () => {
@@ -56,18 +59,86 @@ const valorCarta = (puntos, carta) =>{
 //Funcion para añadir jugadores en html
 const jugadorNuevo = (aux) =>{
     const jug = document.createElement("div");
-    jug.classList.add("col", "marcador");
+    //Se crea un div con las clases "col" y "marcador" en el HTML
+    jug.classList.add("col", "marcador"); 
+    //En el interior del div se encontrara el h1 que simula el marcador y el div en el que se almacenan las imagenes
     jug.innerHTML = "<h1>Jugador "+aux+" - <small>0</small></h1> </n> <div id='jugador-cartas'></div>";
+    //Todo lo anterior se incorporará al div "addJugador"
     document.getElementById("addJugador").appendChild(jug);
 };   
 
+//Se crean tantos jugadores como indique "num"
 const crearJugadores = (num) =>{
     for (let i = 1; i<= num; i++){
         jugadorNuevo(i);
     }
 };
 
-//-->EVENTOS<--//
+//Creamos las imagenes de las cartas al jugador seleccionado
+const crearCarta = (numCartas, jug) =>{
+    //Variables que se necesitan
+    carta1 = pedirCarta();
+    nuevaCarta1 = document.createElement("img");
+
+    //Solo si se piden dos cartas carta2 y nuevaCarta2 tendra funcionalidad
+    carta2 = (numCartas === 2) ? pedirCarta() : null;
+    nuevaCarta2 = (numCartas === 2) ? document.createElement("img") : null;
+
+    //Se crean las cartas y se suma su valor a los puntos del jugador
+    carta1 = pedirCarta();
+    puntosJugadores[jug] += valorCarta(puntosJugadores[jug], carta1);
+    
+    //si esta creada se pide una segunda carta
+    if(carta2){carta2 = pedirCarta();
+    puntosJugadores[jug] += valorCarta(puntosJugadores[jug], carta2);
+    };
+
+    //Seleccionamos el div cuyo id es "jugador-cartas"
+    const divCartaJugador = document.querySelectorAll("#jugador-cartas");
+    
+    //Creamos la imagen de la carta
+    nuevaCarta1 = document.createElement("img");
+    nuevaCarta1.classList.add("carta");
+    nuevaCarta1.src = "img/"+carta1+".png";
+    //Añadimos la imagen al div correspondiente al jugador
+    divCartaJugador[jug].append(nuevaCarta1);
+
+    //Si esta creada, se pide una segunda carta
+    if(nuevaCarta2){ 
+    nuevaCarta2 = document.createElement("img");
+    nuevaCarta2.classList.add("carta");
+    nuevaCarta2.src = "img/"+carta2+".png";
+    divCartaJugador[jug].append(nuevaCarta2);
+    }
+
+    //Definimos la constante marcador, con los jugadores ya creados
+    const marcador = document.querySelectorAll("small");
+    //Añadimos la puntuacion
+    marcador[jug].innerText = puntosJugadores[jug]; 
+    console.log("puntos Jug",jug+1,"=", puntosJugadores[jug]);
+};
+
+
+const controlarPuntos = () =>{
+    //Controlar puntos del jugador
+    let I = 0;
+    do{
+        if (puntosJugadores[I] > 21){
+            resultado.innerText = "--- Jugador ",I++," PIERDE ---"
+            
+            //el boton Pedir y el boton Pasar no se podran usar, ademas sera el turno del siguiente
+            btPedir.disabled = true;
+            btPasar.disabled = true;
+        } else if (puntosJugadores[I] === 21){
+            resultado.innerText = "--- Jugador ",I++," GANA ---"
+        
+            //el boton Pedir y el boton Pasar no se podran usar, ademas sera el turno del siguiente
+            btPedir.disabled = true;
+            btPasar.disabled = true;
+        }
+        I++;
+    } while (I <= jugadores);
+}
 
 //Preguntar cuantas jugadores habra por pantalla
 function obtenerJugadores () {
@@ -75,6 +146,8 @@ function obtenerJugadores () {
     formJugadores.options[formJugadores.selectedIndex].value; //Examina la opcion marcada
     return parseInt(formJugadores.options[formJugadores.selectedIndex].text, 10); //Pasa la opcion a número decimal
 };
+
+//-->EVENTOS<--//
 
 //Cuando se haga click en el boton enviar...
 botonEnviar.addEventListener("click", () =>{
@@ -87,34 +160,20 @@ botonEnviar.addEventListener("click", () =>{
     main.style.zIndex = 1; //La pantalla de juego pasa a primer plano
     cuestionario.style.zIndex = 0;//La eleccion de jugadores pasa a segundo plano
 
-    
-    const carta1 = pedirCarta();
-    console.log("carta1: ", carta1);
-    const carta2 = pedirCarta();
-    puntosJ1 += valorCarta(puntosJ1, carta1);
-    puntosJ1 += valorCarta(puntosJ1, carta2);
-
-    //Redefinimos la constante marcador, con los jugadores ya creados
-    const marcador = document.querySelectorAll("small");
-    marcador[0].innerText = puntosJ1; 
-    console.log("puntos Jug1: ", puntosJ1);
-
-    //Creamos las imagenes de las cartas
-    const crearCarta = () =>{
-        const divCartaJugador = document.querySelectorAll("#jugador-cartas");
-        const nuevaCarta1 = document.createElement("img");
-        nuevaCarta1.classList.add("carta");
-        nuevaCarta1.src = "img/"+carta1+".png";
-        divCartaJugador[0].append(nuevaCarta1);
-        const nuevaCarta2 = document.createElement("img");
-        nuevaCarta2.classList.add("carta");
-        nuevaCarta2.src = "img/"+carta2+".png";
-        divCartaJugador[0].append(nuevaCarta2);
+    //En un inicio todos los jugadores empiezan con dos cartas
+    for(let i = 0; i<= jugadores; i++){
+        crearCarta(2,i);
     };
-    
-    crearCarta();
 });
 
+//Cuando se haga click sobre el boton pedir...
+// botonPedir.addEventListener("click", () =>{
+//     rotulo;
+//     for(let i = 0; i<= jugadores; i++){
+//         crearCarta(1,i);
+
+//     };
+// })
 
 
 crearBaraja();
