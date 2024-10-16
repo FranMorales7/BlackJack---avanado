@@ -1,6 +1,6 @@
 html, body{
-    background-color: #a65848;
     color: white;
+    background-color: rgb(10, 80, 10);
 }
 
 .cabecera{
@@ -56,5 +56,5 @@ html, body{
 
 .tamLetra h1{
     font-style: italic;
-    background-color: lightgreen;
+    background-color: rgb(196, 249, 37);
 }
