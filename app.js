@@ -20,6 +20,10 @@ const cuestionario = document.getElementById("cuestionario");
 const main = document.getElementById("main");
 const resultado = document.querySelector("#Ganador");
 const rotulo = document.querySelectorAll(".marcador");
+const marcadorCrupier = document.querySelector("#crupier-marcador");
+const divCartaCrupier = document.querySelector("#crupier-cartas");
+const divCartaJugador = document.querySelectorAll("#jugador-cartas");
+
 
 //Crear cartas
 const crearBaraja = () => {
@@ -120,34 +124,35 @@ const crearCarta = (numCartas, jug) =>{
     console.log("puntos Jug",jug+1,"=", puntosJugadores[jug]);
 };
 
-
-const controlarPuntos = () =>{
-    //Controlar puntos del jugador
-    let I = 0;
-    do{
-        if (puntosJugadores[I] > 21){
-            resultado.innerText = "--- Jugador ",I++," PIERDE ---"
-            
-            //el boton Pedir y el boton Pasar no se podran usar, ademas sera el turno del siguiente
-            btPedir.disabled = true;
-            btPasar.disabled = true;
-        } else if (puntosJugadores[I] === 21){
-            resultado.innerText = "--- Jugador ",I++," GANA ---"
-        
-            //el boton Pedir y el boton Pasar no se podran usar, ademas sera el turno del siguiente
-            btPedir.disabled = true;
-            btPasar.disabled = true;
-        }
-        I++;
-    } while (I <= jugadores);
-}
-
 //Preguntar cuantas jugadores habra por pantalla
 function obtenerJugadores () {
     formJugadores;  //Entra en el formulario de jugadores
     formJugadores.options[formJugadores.selectedIndex].value; //Examina la opcion marcada
     return parseInt(formJugadores.options[formJugadores.selectedIndex].text, 10); //Pasa la opcion a número decimal
 };
+
+//Se crea las cartas iniciales al crupier
+const cartasCrupier = () =>{
+    //El crupier tendra dos cartas, pero solo mostrara una de ellas
+    const carta = pedirCarta();
+    puntosCrupier += valorCarta(carta);
+    
+    //Se añade sus puntos al marcador
+    marcadorCrupier.innerText = puntosCrupier;
+    console.log("Puntos crupier = ",puntosCrupier);
+    
+    //Se crea la imagen de la carta
+    const cartaImgCrupier = document.createElement("img");
+    cartaImgCrupier.classList.add("carta");
+    cartaImgCrupier.src = "img/"+carta+".png";
+    divCartaCrupier.append(cartaImgCrupier);
+
+    //Se crea la carta con reverso
+    let cartaReverso = document.createElement("img");
+    cartaReverso.classList.add("carta");
+    cartaReverso.src = "img/reverso-gris.png";
+    divCartaCrupier.append(cartaReverso);
+}
 
 //-->EVENTOS<--//
 
@@ -161,64 +166,87 @@ botonEnviar.addEventListener("click", () =>{
     main.style.opacity = 100; //Aparecce la pantalla de juego
     main.style.zIndex = 1; //La pantalla de juego pasa a primer plano
     cuestionario.style.zIndex = 0;//La eleccion de jugadores pasa a segundo plano
+    
+    
+
+    //Destacamos al jugador 1
+    const rotulo = document.querySelectorAll(".marcador");
+    rotulo[0].classList.add("tamLetra");
+    
+    //Se crean las cartas del crupier
+    cartasCrupier();
 
     //En un inicio todos los jugadores empiezan con dos cartas
     for(let i = 0; i<= jugadores; i++){
         crearCarta(2,i);
     };
+    
+    
+    
+
 });
 
-// Cuando se haga click sobre el botón pedir...
+// Cuando se haga click en el botón pedir...
 botonPedir.addEventListener("click", () => {
     const rotulo = document.querySelectorAll(".marcador");
 
     // Verificamos si el jugador actual tiene 21 puntos o menos
     if (puntosJugadores[jugadorActual] <= 21) {
-        rotulo[jugadorActual].classList.add("tamLetra");  // Resaltar al jugador actual
-        crearCarta(1, jugadorActual);  // Añadir una carta al jugador actual
-
-        // Verificar si después de pedir carta el jugador se pasó de 21
+        // Resalta al jugador actual y le añade una carta
+        rotulo[jugadorActual].classList.add("tamLetra");  
+        crearCarta(1, jugadorActual);  
+        // Verificar si después de pedir carta el jugador se ha pasado de 21 puntos
         if (puntosJugadores[jugadorActual] > 21) {
-            rotulo[jugadorActual].classList.remove("tamLetra");  // Quitar resaltado del jugador actual
-            jugadorActual++;  // Pasar al siguiente jugador
-            if (jugadorActual < jugadores) {  // Si quedan más jugadores
-                rotulo[jugadorActual].classList.add("tamLetra");  // Resaltar al siguiente jugador
-            } else {
-                botonPedir.disabled = true;  // Si ya no quedan más jugadores, deshabilitar el botón
-            }
-        } else if (puntosJugadores[jugadorActual] === 21) {  // Si alcanza 21 puntos
+            // Quitar resaltado del jugador actual y pasar al siguiente
+            rotulo[jugadorActual].classList.remove("tamLetra");  
+            avanzarTurno();  
+            // Si alcanza 21 puntos
+        } else if (puntosJugadores[jugadorActual] === 21) {  
             rotulo[jugadorActual].classList.remove("tamLetra");
-            resultado.innerText = "--- Jugador "+(jugadorActual + 1)+"GANA ---";  // Mostrar ganador
-            jugadorActual++;
-            if (jugadorActual < jugadores) {
-                rotulo[jugadorActual].classList.add("tamLetra");  // Resaltar al siguiente jugador
-            } else {
-                botonPedir.disabled = true;  // Si ya no quedan más jugadores, deshabilitar el botón
-                console.log("Fin del juego.");
-            }
+            resultado.innerText = "--- Jugador " + (jugadorActual + 1) + " GANA ---";  // Mostrar ganador
+            avanzarTurno();  
         }
     }
-   
-}); 
-//Si se hace click en el boton Pasar
-botonPasar.addEventListener("click", () =>{
-    botonPedir.disabled = true;
-    botonPasar.disabled = true;
+});
+
+// Si se hace click en el botón Pasar
+botonPasar.addEventListener("click", () => {
+    avanzarTurno();  // Pasar al siguiente jugador
+});
+
+// Función para avanzar al siguiente turno
+const avanzarTurno = () => {
+    const rotulo = document.querySelectorAll(".marcador");
+
+    // Quitar resaltado del jugador actual
     rotulo[jugadorActual].classList.remove("tamLetra");
+
+    // Pasar al siguiente jugador
     jugadorActual++;
+
+    // Si hay más jugadores...
     if (jugadorActual < jugadores) {
-        // Si hay más jugadores, habilitamos los botones para el nuevo jugador
-        botonPedir.disabled = false;
-        botonPasar.disabled = false;
-        rotulo[jugadorActual].classList.add("tamLetra");
-        //Si el jugador supera los 21 puntos
-    } else if(puntosJugadores[jugadorActual] >= 21){
+        //  y si el jugador tiene menos de 21 puntos
+        if (puntosJugadores[jugadorActual] < 21) {
+            // Habilitar botones Pedir y Pasar
+            botonPedir.disabled = false;  
+            botonPasar.disabled = false;  
+            // Resaltar al siguiente jugador    
+            rotulo[jugadorActual].classList.add("tamLetra");  
+
+        // y si el jugador supera los 21 puntos, deshabilitar los botones
+        } else if (puntosJugadores[jugadorActual] >= 21) {
+            botonPedir.disabled = true;
+            botonPasar.disabled = true;
+        }
+
+        // Si no hay más jugadores, deshabilitar los botones
+    } else {
         botonPedir.disabled = true;
         botonPasar.disabled = true;
-        rotulo[jugadorActual].classList.remove("tamLetra");
-        jugadorActual++;
+        console.log("Todos los jugadores han terminado.");
     }
-});
+};
 
 crearBaraja();
 console.log("Baraja ordenada",baraja);
