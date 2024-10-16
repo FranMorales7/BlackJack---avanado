@@ -14,15 +14,16 @@ let jugadorActual = 0;
 //Referencias al html
 const botonEnviar = document.querySelector("#enviarJug");
 const botonPedir = document.querySelector("#btnPedir");
+const botonNuevo = document.querySelector("#btnNuevo");
 const botonPasar = document.querySelector("#btnPasar");
 const formJugadores = document.getElementById("numJugadores");
 const cuestionario = document.getElementById("cuestionario");
 const main = document.getElementById("main");
-const resultado = document.querySelector("#Ganador");
+let resultado = document.querySelector("#Ganador");
 const rotulo = document.querySelectorAll(".marcador");
 const marcadorCrupier = document.querySelector("#crupier-marcador");
 const divCartaCrupier = document.querySelector("#crupier-cartas");
-const divCartaJugador = document.querySelectorAll("#jugador-cartas");
+const divCartaJugador = document.querySelectorAll(".jugador-cartas");
 
 
 //Crear cartas
@@ -68,7 +69,7 @@ const jugadorNuevo = (aux) =>{
     //Se crea un div con las clases "col" y "marcador" en el HTML
     jug.classList.add("col", "marcador"); 
     //En el interior del div se encontrara el h1 que simula el marcador y el div en el que se almacenan las imagenes
-    jug.innerHTML = "<h1>Jugador "+aux+" - <small>0</small></h1> </n> <div id='jugador-cartas'></div>";
+    jug.innerHTML = "<h1>Jugador "+aux+" - <small>0</small></h1> </n> <div class='jugador-cartas'></div>";
     //Todo lo anterior se incorporará al div "addJugador"
     document.getElementById("addJugador").appendChild(jug);
 };   
@@ -100,7 +101,7 @@ const crearCarta = (numCartas, jug) =>{
     };
 
     //Seleccionamos el div cuyo id es "jugador-cartas"
-    const divCartaJugador = document.querySelectorAll("#jugador-cartas");
+    const divCartaJugador = document.querySelectorAll(".jugador-cartas");
     
     //Creamos la imagen de la carta
     nuevaCarta1 = document.createElement("img");
@@ -152,7 +153,92 @@ const cartasCrupier = () =>{
     cartaReverso.classList.add("carta");
     cartaReverso.src = "img/reverso-gris.png";
     divCartaCrupier.append(cartaReverso);
-}
+};
+
+//Cuando todos los jugadores hayan participado, es el turno del crupier
+const cartaCrupier = () =>{
+    //Se elimina la carta del reves si existe
+    const cartaReverso = divCartaCrupier.querySelector('img[src="img/reverso-gris.png"]');
+    if (cartaReverso) { 
+        divCartaCrupier.removeChild(cartaReverso);
+    }
+    
+    //El crupier pedira una carta hasta que supere a los jugadores, sin pasarse de 21 puntos
+    do{
+        const carta = pedirCarta();
+        puntosCrupier += valorCarta(carta);
+        
+        //Se añade sus puntos al marcador
+        marcadorCrupier.innerText = puntosCrupier;
+        console.log("Puntos crupier = ",puntosCrupier);
+        
+        //Se crea la imagen de la carta nueva
+        const cartaImgCrupier = document.createElement("img");
+        cartaImgCrupier.classList.add("carta");
+        cartaImgCrupier.src = "img/"+carta+".png";
+        divCartaCrupier.append(cartaImgCrupier);
+        
+        //Si se pasa de 21, salir del bucle
+        if (puntosCrupier > 21){
+        console.log("El crupier se ha pasado de 21");
+        break;
+        
+    }
+    } while(puntosCrupier < 17);
+    
+    comprobacion();
+};
+
+//Comprobar puntos de los jugadores con la banca
+const jugGanador = [];
+const comprobacion = () =>{
+    // Para almacenar los puntos más altos entre los jugadores
+    let puntosMax = 0; 
+    // Limpiar el array de jugadores ganadores 
+    jugGanador.length = 0; 
+
+    // Comprobamos los puntos de cada jugador y guardamos al que tiene los puntos más altos sin pasarse de 21
+    for (let i = 0; i < jugadores; i++) {
+        if (puntosJugadores[i] <= 21) { // Solo jugadores que no se han pasado de 21
+            if (puntosJugadores[i] > puntosMax) {
+                // Actualiza los puntos máximos
+                puntosMax = puntosJugadores[i]; 
+                jugGanador.length = 0; // Limpiamos la lista de ganadores actuales
+                jugGanador.push(i); // Añadimos el jugador actual como ganador
+            } else if (puntosJugadores[i] === puntosMax) {
+                jugGanador.push(i); // Añadimos otro jugador si hay empate
+            }
+        }
+    }
+
+    // Comprobamos los puntos del crupier con los del jugador o jugadores ganadores
+    // Si el crupier se pasa de 21 puntos...
+    if (puntosCrupier > 21) { 
+        //... y los jugadores también
+        if (jugGanador.length === 0) {
+            resultado.innerText = "--- Todos se pasaron ---";
+         }
+    else if (puntosCrupier === puntosMax) { 
+        resultado.innerText = "--- Empate entre el crupier y : \n";
+        for(let i = 0; i < jugGanador.length; i++){
+            resultado.innerText += ` Jugador ${(jugGanador[i]+1)} --- \n`;
+            };
+        }
+        
+        // El crupier tiene más puntos que los jugadores ganadores
+    } else if (puntosCrupier > puntosMax) { 
+        resultado.innerText = `--- Crupier GANA con ${puntosCrupier} puntos ---`;
+       
+        // Jugadores ganan al crupier
+    } else if (puntosMax > puntosCrupier) { 
+        for(let i = 0; i < jugGanador.length; i++){
+            resultado.innerText += `--- Jugador ${(jugGanador[i]+1)} GANA con ${puntosMax} puntos --- \n`;
+        };
+    }
+     
+};
+
+
 
 //-->EVENTOS<--//
 
@@ -163,7 +249,7 @@ botonEnviar.addEventListener("click", () =>{
     crearJugadores(jugadores);//Se crea los marcadores en el html
     botonEnviar.disabled = true;//Se deshabilita la opcion de enviar
     cuestionario.style.display = "none"; //Desaparece el cuestionario
-    main.style.opacity = 100; //Aparecce la pantalla de juego
+    main.style.opacity = 100; //Aparece la pantalla de juego
     main.style.zIndex = 1; //La pantalla de juego pasa a primer plano
     cuestionario.style.zIndex = 0;//La eleccion de jugadores pasa a segundo plano
     
@@ -176,14 +262,11 @@ botonEnviar.addEventListener("click", () =>{
     //Se crean las cartas del crupier
     cartasCrupier();
 
-    //En un inicio todos los jugadores empiezan con dos cartas
+    //Se reparten dos cartas a cada jugador
     for(let i = 0; i<= jugadores; i++){
         crearCarta(2,i);
     };
     
-    
-    
-
 });
 
 // Cuando se haga click en el botón pedir...
@@ -240,13 +323,50 @@ const avanzarTurno = () => {
             botonPasar.disabled = true;
         }
 
-        // Si no hay más jugadores, deshabilitar los botones
+        // Si no hay más jugadores ... 
     } else {
+        //deshabilitar los botones 
         botonPedir.disabled = true;
         botonPasar.disabled = true;
-        console.log("Todos los jugadores han terminado.");
-    }
+        //mostrar segunda carta del crupier y hacer comprobacion
+        comprobacion();
+        cartaCrupier();
+        }
 };
+
+//Si se hace click en el boton nuevo
+botonNuevo.addEventListener("click", () =>{
+    // Reiniciar variables del juego
+    jugadores = 0;
+    jugadorActual = 0;
+    baraja = [];
+    puntosJugadores.fill(0);
+    puntosCrupier = 0;
+
+    // Limpiar las cartas en pantalla
+    document.querySelectorAll(".jugador-cartas").forEach(div => div.innerHTML = '');
+    divCartaCrupier.innerHTML = '';
+
+    // Ocultar el marcador del crupier
+    marcadorCrupier.innerText = "0";
+
+    // Reiniciar texto de resultados
+    resultado.innerText = "";
+
+    // Limpiar la pantalla de juego y mostrar el formulario de selección de jugadores
+    main.style.opacity = 0;
+    main.style.zIndex = 0; // La pantalla de juego pasa a segundo plano
+    cuestionario.style.zIndex = 1; // La elección de jugadores pasa a primer plano
+    cuestionario.style.display = "block"; // Vuelve a mostrar el cuestionario
+    botonEnviar.disabled = false; // Reactivar el botón de enviar
+    botonPedir.disabled = false;
+    botonPasar.disabled = false;
+    // Limpiar jugadores anteriores
+    document.getElementById("addJugador").innerHTML = '';
+
+    // Crear nueva baraja
+    crearBaraja();
+});
 
 crearBaraja();
 console.log("Baraja ordenada",baraja);
