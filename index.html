@@ -9,60 +9,60 @@
 </head>
 <body>
     <header class="cabecera">Black Jack</header>
-    <main>
+    <!--Formulario con el total de participantes posibles-->
         <div id="cuestionario">
             <label for="numJugadores">¿Cuántos jugadores van a participar?</label>
-            <select id="numJugadores" onchange="obtenerJugadores();">
-                <option value="jug=2">2</option>
-                <option value="jug=3">3</option>
-                <option value="jug=4">4</option>
-                <option value="jug=5">5</option>
-                <option value="jug=6">6</option>
+            <select id="numJugadores" onchange="obtenerJugadores()">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
             </select>
             <button id = "enviarJug" type="button" class="btn btn-primary" onclick="obtenerJugadores()">Enviar</button>
         </div>
-
+<div class="tablero">
     <div id="main">
+        <!-- Seccion del crupier -->
+        <div class="row container div-crupier">
+            <img src="img/crupier.png" class="imgCrupier"/>
+            <h1>Crupier - <small id="crupier-marcador">0</small></h1>
+            <div id="crupier-cartas">
+                <!--Aqui se mostrara las imagenes de las cartas
+                <img class="carta" src="img/10C.png" alt=""/>
+                -->
+            </div>
+        </div>
+
+        <!-- Seccion de los jugadores -->
+        <div class="row container div-jugadores">
+            <div class="col">
+                <div class="row row-cols-3" id="addJugador"> 
+                    <!-- Aqui se mostrara el marcador y las cartas
+                    <div class="col">
+                    <h1>Jugador 1 - <small>0</small></h1>
+                        <div class="jugador-cartas">
+                        <img class="carta" src="img/10C.png" alt=""/>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Seccion de los botones -->
         <div class="row mt-2">
-            <div id="boton" class="col text-center">
+            <div id="boton" class="col row-cols-1 text-center">
                 <button id="btnNuevo" class="btn btn-primary">Nuevo juego</button>
-                <button id="btnPedir" class="btn btn-success">Pedir carta</button>
+                <button id="btnPedir" class="btn btn-warning">Pedir carta</button>
                 <button id="btnPasar" class="btn btn-danger">Pasar</button>
             </div>
         </div>
-        <div class="row container">
-            <div class="col">
-                <div class="row row-cols-3" id="addJugador"> 
-                  <!--  <div class="col">
-                     <h1 class="marcador">Jugador Alpha - <small>0</small></h1>
-                    <img class="carta" src="img/10C.png" alt=""/>     
-                    </div>
-                    <div class="col">
-                    <h1>Jugador 1 - <small>0</small></h1>
-                    <img class="carta" src="img/10C.png" alt=""/>
-                    </div>
-                    <div class="col">
-                    <h1>Jugador 1 - <small>0</small></h1>
-                    <img class="carta" src="img/10C.png" alt=""/>   
-                    </div> -->
-                </div>
-                
-                <!-- <div id="jugador-cartas">
-                  <img class="carta" src="img/10C.png" alt=""/>
-                </div> -->
-            </div>
-        </div>
-        <div class="row container">
-            <div class="col" >
-                <h1>Crupier - <small id="crupier-marcador">0</small></h1>
-                <div id="crupier-cartas">
-                    <!--<img class="carta" src="img/10C.png" alt=""/>-->
-                </div>
-            </div>
-        </div>
-        <div id="Ganador">Ganador aquí</div>
+
+        <!-- Seccion del rotulo con el o los ganadores -->
+        <div id="Ganador"></div>
     </div>
-    </main>
+</div>
     <script src="js/underscore.js"></script>
     <script src="js/app.js"></script>
     <footer class="cabecera">
