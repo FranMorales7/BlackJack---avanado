@@ -50,7 +50,7 @@ const crearBaraja = () => {
 const pedirCarta = () =>{
     if(baraja.length === 0){throw "No quedan cartas";} 
     else{
-        const carta = baraja.pop(); //Saca una carta del array baraja y lo muestra
+        const carta = baraja.pop(); //Saca una carta del array baraja y la muestra
         return carta;
     };
 };
@@ -61,6 +61,13 @@ const valorCarta = (carta) =>{
     //Si no es un número, la A valdrá 11 puntos y el resto de especiales 10
     let valor = isNaN(puntos) ? (puntos === "A" ? 11 : 10) : puntos * 1;
     return valor;
+};
+
+//Preguntar cuantas jugadores habra por pantalla
+function obtenerJugadores () {
+    formJugadores;  //Entra en el formulario de jugadores
+    formJugadores.options[formJugadores.selectedIndex].value; //Examina la opcion marcada
+    return parseInt(formJugadores.options[formJugadores.selectedIndex].text, 10); //Pasa la opcion a número decimal
 };
 
 //Funcion para añadir jugadores en html
@@ -87,7 +94,7 @@ const crearCarta = (numCartas, jug) =>{
     carta1 = pedirCarta();
     nuevaCarta1 = document.createElement("img");
 
-    //Solo si se piden dos cartas carta2 y nuevaCarta2 tendra funcionalidad
+    //Solo si numCartas es dos, carta2 y nuevaCarta2 tendran funcionalidad
     carta2 = (numCartas === 2) ? pedirCarta() : null;
     nuevaCarta2 = (numCartas === 2) ? document.createElement("img") : null;
 
@@ -96,11 +103,12 @@ const crearCarta = (numCartas, jug) =>{
     puntosJugadores[jug] += valorCarta(carta1);
     
     //si esta creada se pide una segunda carta
-    if(carta2){carta2 = pedirCarta();
-    puntosJugadores[jug] += valorCarta(carta2);
+    if(carta2){
+        carta2 = pedirCarta();
+        puntosJugadores[jug] += valorCarta(carta2);
     };
 
-    //Seleccionamos el div cuyo id es "jugador-cartas"
+    //Seleccionamos el div cuya clase es "jugador-cartas"
     const divCartaJugador = document.querySelectorAll(".jugador-cartas");
     
     //Creamos la imagen de la carta
@@ -121,15 +129,9 @@ const crearCarta = (numCartas, jug) =>{
     //Definimos la constante marcador, con los jugadores ya creados
     const marcador = document.querySelectorAll("small");
     //Añadimos la puntuacion
-    marcador[jug].innerText = puntosJugadores[jug]; 
+    marcador[jug+1].innerText = puntosJugadores[jug]; //El primer marcador lo ocupa el crupier
     console.log("puntos Jug",jug+1,"=", puntosJugadores[jug]);
-};
 
-//Preguntar cuantas jugadores habra por pantalla
-function obtenerJugadores () {
-    formJugadores;  //Entra en el formulario de jugadores
-    formJugadores.options[formJugadores.selectedIndex].value; //Examina la opcion marcada
-    return parseInt(formJugadores.options[formJugadores.selectedIndex].text, 10); //Pasa la opcion a número decimal
 };
 
 //Se crea las cartas iniciales al crupier
@@ -155,16 +157,15 @@ const cartasCrupier = () =>{
     divCartaCrupier.append(cartaReverso);
 };
 
-//Cuando todos los jugadores hayan participado, es el turno del crupier
+//Turno del crupier
 const cartaCrupier = () =>{
-    //Se elimina la carta del reves si existe
+    //Se elimina la carta del reves
     const cartaReverso = divCartaCrupier.querySelector('img[src="img/reverso-gris.png"]');
-    if (cartaReverso) { 
-        divCartaCrupier.removeChild(cartaReverso);
-    }
+    divCartaCrupier.removeChild(cartaReverso);
     
-    //El crupier pedira una carta hasta que supere a los jugadores, sin pasarse de 21 puntos
+    //El crupier pedira una carta hasta que supere a los jugadores, sin pasarse de 17 puntos
     do{
+        //Pide una carta
         const carta = pedirCarta();
         puntosCrupier += valorCarta(carta);
         
@@ -190,52 +191,42 @@ const cartaCrupier = () =>{
 };
 
 //Comprobar puntos de los jugadores con la banca
-const jugGanador = [];
-const comprobacion = () =>{
-    // Para almacenar los puntos más altos entre los jugadores
-    let puntosMax = 0; 
-    // Limpiar el array de jugadores ganadores 
-    jugGanador.length = 0; 
+const comprobacion = () => {
+    let puntosMax = 0;
+    const jugGanador = [];
 
-    // Comprobamos los puntos de cada jugador y guardamos al que tiene los puntos más altos sin pasarse de 21
+    //Si los puntos del jugador son menores o iguales a 21 y son más altos que la puntuacion maxima hasta el momento
     for (let i = 0; i < jugadores; i++) {
-        if (puntosJugadores[i] <= 21) { // Solo jugadores que no se han pasado de 21
-            if (puntosJugadores[i] > puntosMax) {
-                // Actualiza los puntos máximos
-                puntosMax = puntosJugadores[i]; 
-                jugGanador.length = 0; // Limpiamos la lista de ganadores actuales
-                jugGanador.push(i); // Añadimos el jugador actual como ganador
-            } else if (puntosJugadores[i] === puntosMax) {
-                jugGanador.push(i); // Añadimos otro jugador si hay empate
-            }
+        if (puntosJugadores[i] <= 21 && puntosJugadores[i] > puntosMax) {
+            //La puntuacion del jugador pasa a ser la mas alta
+            puntosMax = puntosJugadores[i];
+            //Se reinicia la lista de jugadores victoriosos
+            jugGanador.length = 0;
+            //Se añade la posicion del jugador a la lista
+            jugGanador.push(i);
+            //Si hay un empate entre puntos, se agrega el jugador igualmente
+        } else if (puntosJugadores[i] === puntosMax) {
+            jugGanador.push(i);
         }
     }
 
-    // Comprobamos los puntos del crupier con los del jugador o jugadores ganadores
-    // Si el crupier se pasa de 21 puntos...
-    if (puntosCrupier > 21) { 
-        //... y los jugadores también
-        if (jugGanador.length === 0) {
-            resultado.innerText = "--- Todos se pasaron ---";
-         }
-    else if (puntosCrupier === puntosMax) { 
-        resultado.innerText = "--- Empate entre el crupier y : \n";
-        for(let i = 0; i < jugGanador.length; i++){
-            resultado.innerText += ` Jugador ${(jugGanador[i]+1)} --- \n`;
-            };
-        }
-        
-        // El crupier tiene más puntos que los jugadores ganadores
-    } else if (puntosCrupier > puntosMax) { 
+    //Se reinicia el resultado
+    resultado.innertext = "";
+    
+    //Si el crupier se ha pasado de puntos o bien se ha quedado corto...
+    if (puntosCrupier > 21 || puntosMax > puntosCrupier) {
+        //Se muestra los jugadores que han ganado y con cuantos puntos 
+        jugGanador.forEach((jug) => {
+             resultado.innerText += `--- Jugador ${jug + 1} GANA con ${puntosMax} puntos ---\n`;
+         });
+    //Si el crupier ha obtenido los mismos puntos que el jugador con mayor puntuaje
+    } else if (puntosCrupier === puntosMax) {
+        //Se mostrara un mensaje de empate
+        resultado.innerText = "--- Empate con el Crupier ---";
+    } else {
+        //Si el crupier es el ganador
         resultado.innerText = `--- Crupier GANA con ${puntosCrupier} puntos ---`;
-       
-        // Jugadores ganan al crupier
-    } else if (puntosMax > puntosCrupier) { 
-        for(let i = 0; i < jugGanador.length; i++){
-            resultado.innerText += `--- Jugador ${(jugGanador[i]+1)} GANA con ${puntosMax} puntos --- \n`;
-        };
     }
-     
 };
 
 
@@ -245,15 +236,12 @@ const comprobacion = () =>{
 //Cuando se haga click en el boton enviar...
 botonEnviar.addEventListener("click", () =>{
     jugadores = obtenerJugadores();//El valor guardado será el numero de jugadores
-    console.log("Jugadores: ", obtenerJugadores());
     crearJugadores(jugadores);//Se crea los marcadores en el html
     botonEnviar.disabled = true;//Se deshabilita la opcion de enviar
     cuestionario.style.display = "none"; //Desaparece el cuestionario
     main.style.opacity = 100; //Aparece la pantalla de juego
     main.style.zIndex = 1; //La pantalla de juego pasa a primer plano
     cuestionario.style.zIndex = 0;//La eleccion de jugadores pasa a segundo plano
-    
-    
 
     //Destacamos al jugador 1
     const rotulo = document.querySelectorAll(".marcador");
@@ -266,7 +254,7 @@ botonEnviar.addEventListener("click", () =>{
     for(let i = 0; i<= jugadores; i++){
         crearCarta(2,i);
     };
-    
+
 });
 
 // Cuando se haga click en el botón pedir...
@@ -274,21 +262,16 @@ botonPedir.addEventListener("click", () => {
     const rotulo = document.querySelectorAll(".marcador");
 
     // Verificamos si el jugador actual tiene 21 puntos o menos
-    if (puntosJugadores[jugadorActual] <= 21) {
+    if (puntosJugadores[jugadorActual] < 21) {
         // Resalta al jugador actual y le añade una carta
         rotulo[jugadorActual].classList.add("tamLetra");  
         crearCarta(1, jugadorActual);  
-        // Verificar si después de pedir carta el jugador se ha pasado de 21 puntos
-        if (puntosJugadores[jugadorActual] > 21) {
+        // Verificar si después de pedir carta si el jugador se ha pasado o ha llegado a 21 puntos
+        if (puntosJugadores[jugadorActual] >= 21) {
             // Quitar resaltado del jugador actual y pasar al siguiente
             rotulo[jugadorActual].classList.remove("tamLetra");  
             avanzarTurno();  
-            // Si alcanza 21 puntos
-        } else if (puntosJugadores[jugadorActual] === 21) {  
-            rotulo[jugadorActual].classList.remove("tamLetra");
-            resultado.innerText = "--- Jugador " + (jugadorActual + 1) + " GANA ---";  // Mostrar ganador
-            avanzarTurno();  
-        }
+        } 
     }
 });
 
@@ -318,9 +301,10 @@ const avanzarTurno = () => {
             rotulo[jugadorActual].classList.add("tamLetra");  
 
         // y si el jugador supera los 21 puntos, deshabilitar los botones
-        } else if (puntosJugadores[jugadorActual] >= 21) {
+        } else if (puntosJugadores[jugadorActual] > 21) {
             botonPedir.disabled = true;
             botonPasar.disabled = true;
+            jugadorActual++;
         }
 
         // Si no hay más jugadores ... 
@@ -328,9 +312,11 @@ const avanzarTurno = () => {
         //deshabilitar los botones 
         botonPedir.disabled = true;
         botonPasar.disabled = true;
-        //mostrar segunda carta del crupier y hacer comprobacion
-        comprobacion();
+
+        //Es el turno del crupier:
+            //mostrar segunda carta del crupier y hacer comprobacion
         cartaCrupier();
+        comprobacion();
         }
 };
 
@@ -344,7 +330,12 @@ botonNuevo.addEventListener("click", () =>{
     puntosCrupier = 0;
 
     // Limpiar las cartas en pantalla
-    document.querySelectorAll(".jugador-cartas").forEach(div => div.innerHTML = '');
+    let limpiar = document.querySelectorAll(".jugador-cartas");
+
+    limpiar.forEach(carta => {
+        carta = "";
+    });
+
     divCartaCrupier.innerHTML = '';
 
     // Ocultar el marcador del crupier
@@ -358,7 +349,8 @@ botonNuevo.addEventListener("click", () =>{
     main.style.zIndex = 0; // La pantalla de juego pasa a segundo plano
     cuestionario.style.zIndex = 1; // La elección de jugadores pasa a primer plano
     cuestionario.style.display = "block"; // Vuelve a mostrar el cuestionario
-    botonEnviar.disabled = false; // Reactivar el botón de enviar
+    //reactivar los botones
+    botonEnviar.disabled = false; 
     botonPedir.disabled = false;
     botonPasar.disabled = false;
     // Limpiar jugadores anteriores
