@@ -1,4 +1,4 @@
-The BlackJack game, but now it is made it with JavaScript, Html and CSS. <br>
+The BlackJack game, but now it is made with JavaScript, Html and CSS. <br>
 *INSTRUCTION* <br>
 --You can choose how many users will play, with a limit of 6. <br>
 --Then, every  player will receive two cards and can decide if he/she want to get one more, pass or given up. <br>
